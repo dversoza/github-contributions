@@ -68,19 +68,19 @@ The following data is available:
 * Repository **Pull Requests** data
 * Repository **Review Comments** data
 
-# TODOs
+## TODOs
 
-## [#1 PRIORITY] Display the following counts in a dashboard
+### [#1 PRIORITY] Display the following counts in a dashboard
 
-[ ] Total number of commits per user
-[ ] Total number of open pull requests per user
-[ ] Total number of comments per user
-[ ] Total number of reviews in pull requests per user
+* [ ] Total number of commits per user
+* [ ] Total number of open pull requests per user
+* [ ] Total number of comments per user
+* [ ] Total number of reviews in pull requests per user
 
-## [#2 PRIORITY] Display the following counts in a dashboard
+### [#2 PRIORITY] Display the following counts in a dashboard
 
-[ ] Total number of comments in pull requests per user
-[ ] Total number of merged pull requests per user
-[ ] Total number of comments in issues per user
-[ ] Total number of closed pull requests per user
-[ ] Total number of open issues per user
+* [ ] Total number of comments in pull requests per user
+* [ ] Total number of merged pull requests per user
+* [ ] Total number of comments in issues per user
+* [ ] Total number of closed pull requests per user
+* [ ] Total number of open issues per user
