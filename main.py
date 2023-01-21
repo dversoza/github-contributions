@@ -25,7 +25,7 @@ load_dotenv()
 
 GITHUB_API_BASE_URL = "https://api.github.com"
 GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN")
-ORGANIZATION_NAME = os.environ.get("ORGANIZATION_NAME")
+GITHUB_ORGANIZATION = os.environ.get("GITHUB_ORGANIZATION")
 
 
 class AllowedMethods(Enum):
@@ -64,7 +64,7 @@ def base_request(
 
 
 def get_repositories(page: int = 1, per_page: int = 30, *args, **kwargs) -> List[dict]:
-    url = f"{GITHUB_API_BASE_URL}/orgs/{ORGANIZATION_NAME}/repos"
+    url = f"{GITHUB_API_BASE_URL}/orgs/{GITHUB_ORGANIZATION}/repos"
 
     return base_request(
         AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
@@ -74,7 +74,7 @@ def get_repositories(page: int = 1, per_page: int = 30, *args, **kwargs) -> List
 def get_repository_commits(
     repository: str, page: int = 1, per_page: int = 30, *args, **kwargs
 ) -> list:
-    url = f"{GITHUB_API_BASE_URL}/repos/{ORGANIZATION_NAME}/{repository}/commits"
+    url = f"{GITHUB_API_BASE_URL}/repos/{GITHUB_ORGANIZATION}/{repository}/commits"
 
     return base_request(
         AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
@@ -89,7 +89,7 @@ def get_repository_pull_requests(
     *args,
     **kwargs,
 ) -> list:
-    url = f"{GITHUB_API_BASE_URL}/repos/{ORGANIZATION_NAME}/{repository}/pulls"
+    url = f"{GITHUB_API_BASE_URL}/repos/{GITHUB_ORGANIZATION}/{repository}/pulls"
 
     params = {
         "state": state.value,
@@ -103,7 +103,7 @@ def get_repository_pull_requests(
 def get_repository_review_comments(
     repository: str, page: int = 1, per_page: int = 30, *args, **kwargs
 ) -> list:
-    url = f"{GITHUB_API_BASE_URL}/repos/{ORGANIZATION_NAME}/{repository}/pulls/comments"
+    url = f"{GITHUB_API_BASE_URL}/repos/{GITHUB_ORGANIZATION}/{repository}/pulls/comments"
 
     return base_request(
         AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
