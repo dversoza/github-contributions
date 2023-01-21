@@ -10,19 +10,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# TODO: [#1 PRIORITY] Display the following counts in a dashboard:
-# - Total number of commits per user
-# - Total number of open pull requests per user
-# - Total number of comments per user
-# - Total number of reviews in pull requests per user
-
-# TODO: [#2 PRIORITY] Display the following counts in a dashboard:
-# - Total number of comments in pull requests per user
-# - Total number of merged pull requests per user
-# - Total number of comments in issues per user
-# - Total number of closed pull requests per user
-# - Total number of open issues per user
-
 GITHUB_API_BASE_URL = "https://api.github.com"
 GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN")
 GITHUB_ORGANIZATION = os.environ.get("GITHUB_ORGANIZATION")
@@ -103,7 +90,9 @@ def get_repository_pull_requests(
 def get_repository_review_comments(
     repository: str, page: int = 1, per_page: int = 30, *args, **kwargs
 ) -> list:
-    url = f"{GITHUB_API_BASE_URL}/repos/{GITHUB_ORGANIZATION}/{repository}/pulls/comments"
+    url = (
+        f"{GITHUB_API_BASE_URL}/repos/{GITHUB_ORGANIZATION}/{repository}/pulls/comments"
+    )
 
     return base_request(
         AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
