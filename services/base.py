@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List
 
 import requests
+from .exception_handler import exception_handler
 
 
 class BaseGithubAPIService:
@@ -34,9 +35,12 @@ class BaseGithubAPIService:
         )
 
         if response.status_code != 200:
-            raise Exception(
-                f"{response.status_code} {response.reason}: {response.text}"
-            )
+            can_pass, message = exception_handler(response)
+
+            if not can_pass:
+                raise message
+
+            return [{"error": message}]
 
         return response.json()
 
