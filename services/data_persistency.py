@@ -69,6 +69,83 @@ def convert_review_comments_json_into_csv(repository: str):
     df.to_csv(f"review_comments/{repository}.csv", index=False)
 
 
+def convert_dependabot_alerts_json_into_csv(repository: str):
+    df = pd.read_json(f"dependabot_alerts/{repository}.json")
+
+    if df.empty:
+        print(f"Repository {repository} has no dependabot alerts")
+        return
+
+    df = df[
+        [
+            "number",
+            "state",
+            "dependency_name",
+            "dependency_path",
+            "cve_id",
+            "summary",
+            "description",
+            "severity",
+            "published_at",
+            "updated_at",
+            "vulnerable_package_name",
+            "vulnerable_package_version",
+            "first_patched_version",
+            "url",
+            "created_at",
+        ]
+    ]
+
+    df["dependency_name"] = df["dependency_name"].apply(
+        lambda x: x["dependency"]["package"]["name"] if x else None
+    )
+    df["dependency_path"] = df["dependency_path"].apply(
+        lambda x: x["dependency"]["manifest_path"] if x else None
+    )
+
+    df["cve_id"] = df["cve_id"].apply(
+        lambda x: x["security_advisory"]["cve_id"] if x else None
+    )
+    df["summary"] = df["summary"].apply(
+        lambda x: x["security_advisory"]["summary"] if x else None
+    )
+    df["description"] = df["description"].apply(
+        lambda x: x["security_advisory"]["description"] if x else None
+    )
+    df["severity"] = df["severity"].apply(
+        lambda x: x["security_advisory"]["severity"] if x else None
+    )
+    df["published_at"] = df["published_at"].apply(
+        lambda x: x["security_advisory"]["published_at"] if x else None
+    )
+    df["updated_at"] = df["updated_at"].apply(
+        lambda x: x["security_advisory"]["updated_at"] if x else None
+    )
+    df["vulnerable_package_name"] = df["vulnerable_package_name"].apply(
+        lambda x: x["security_advisory"]["vulnerabilities"][0]["package"]["name"]
+        if x
+        else None
+    )
+    df["vulnerable_package_version"] = df["vulnerable_package_version"].apply(
+        lambda x: x["security_advisory"]["vulnerabilities"][0][
+            "vulnerable_version_range"
+        ]
+        if x
+        else None
+    )
+    df["first_patched_version"] = df["first_patched_version"].apply(
+        lambda x: x["security_advisory"]["vulnerabilities"][0]["first_patched_version"][
+            "identifier"
+        ]
+        if x
+        else None
+    )
+    df["url"] = df["url"].apply(lambda x: x["html_url"] if x else None)
+    df["created_at"] = df["created_at"].apply(lambda x: x["created_at"] if x else None)
+
+    df.to_csv(f"dependabot_alerts/{repository}.csv", index=False)
+
+
 def merge_all_repositories_commits_csvs():
     with open("repositories.json", "r") as f:
         repositories = json.loads(f.read())
