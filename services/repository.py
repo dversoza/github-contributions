@@ -16,7 +16,7 @@ class RepositoryService(BaseGithubAPIService):
     def get_repositories(
         self, page: int = 1, per_page: int = 30, *args, **kwargs
     ) -> List[dict]:
-        url = f"{self.GITHUB_API_BASE_URL}/orgs/{self.GITHUB_ORGANIZATION}/repos"
+        url = f"{self.GITHUB_API_BASE_URL}/orgs/{self.organization}/repos"
 
         return self.base_request(
             self.AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
@@ -25,7 +25,9 @@ class RepositoryService(BaseGithubAPIService):
     def get_repository_commits(
         self, repository: str, page: int = 1, per_page: int = 30, *args, **kwargs
     ) -> list:
-        url = f"{self.GITHUB_API_BASE_URL}/repos/{self.GITHUB_ORGANIZATION}/{repository}/commits"
+        url = (
+            f"{self.GITHUB_API_BASE_URL}/repos/{self.organization}/{repository}/commits"
+        )
 
         return self.base_request(
             self.AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
@@ -40,7 +42,7 @@ class RepositoryService(BaseGithubAPIService):
         *args,
         **kwargs,
     ) -> list:
-        url = f"{self.GITHUB_API_BASE_URL}/repos/{self.GITHUB_ORGANIZATION}/{repository}/pulls"
+        url = f"{self.GITHUB_API_BASE_URL}/repos/{self.organization}/{repository}/pulls"
 
         params = {
             "state": state.value,
@@ -55,7 +57,7 @@ class RepositoryService(BaseGithubAPIService):
     def get_repository_review_comments(
         self, repository: str, page: int = 1, per_page: int = 30, *args, **kwargs
     ) -> list:
-        url = f"{self.GITHUB_API_BASE_URL}/repos/{self.GITHUB_ORGANIZATION}/{repository}/pulls/comments"
+        url = f"{self.GITHUB_API_BASE_URL}/repos/{self.organization}/{repository}/pulls/comments"
 
         return self.base_request(
             self.AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
@@ -64,7 +66,7 @@ class RepositoryService(BaseGithubAPIService):
     def get_repository_dependabot_alerts(
         self, repository: str, page: int = 1, per_page: int = 30, *args, **kwargs
     ) -> list:
-        url = f"{self.GITHUB_API_BASE_URL}/repos/{self.GITHUB_ORGANIZATION}/{repository}/dependabot/alerts"
+        url = f"{self.GITHUB_API_BASE_URL}/repos/{self.organization}/{repository}/dependabot/alerts"
 
         return self.base_request(
             self.AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
