@@ -79,6 +79,23 @@ def merge_all_repositories_data():
     data_persistency.merge_all_repositories_review_comments_csvs()
 
 
+def retrieve_all_dependabot_alerts():
+    print("Retrieving all repositories...")
+    repositories = repository_service.retrieve_all(repository_service.get_repositories)
+    print(f"Retrieved {len(repositories)} repositories")
+
+    for repository in repositories:
+        print(f"Retrieving dependabot alerts for {repository['name']}...")
+        dependabot_alerts = repository_service.retrieve_all(
+            repository_service.get_repository_dependabot_alerts,
+            repository=repository["name"],
+        )
+        print(f"Retrieved {len(dependabot_alerts)} dependabot alerts")
+
+        with open(f"dependabot_alerts/{repository['name']}.json", "w") as f:
+            f.write(json.dumps(dependabot_alerts, indent=2))
+
+
 TASKS = [
     (
         "Retrieve repositories analytics data from Github (commits, pull requests and review comments)",
@@ -89,4 +106,5 @@ TASKS = [
         "Merge all repositories data into one CSV file (to analyze in Excel or similar)",
         merge_all_repositories_data,
     ),
+    ("Retrieve all dependabot alerts", retrieve_all_dependabot_alerts),
 ]
