@@ -1,5 +1,9 @@
 import time
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import tasks
 
 
@@ -18,7 +22,7 @@ def main():
         print("Invalid task number")
         return
 
-    print(f"\nExecuting task \#{task} - {tasks.TASKS[task - 1][0]} ...\n")
+    print(f"\nExecuting task #{task} - {tasks.TASKS[task - 1][0]} ...\n")
     time.sleep(1)
     start_time = time.time()
     tasks.TASKS[task - 1][1]()
@@ -32,7 +36,4 @@ def main():
 
 
 if __name__ == "__main__":
-    from dotenv import load_dotenv
-
-    load_dotenv()
     main()
