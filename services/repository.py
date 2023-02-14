@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 from typing import List
 
@@ -71,3 +72,13 @@ class RepositoryService(BaseGithubAPIService):
         return self.base_request(
             self.AllowedMethods.GET, url, page=page, per_page=per_page, *args, **kwargs
         )
+
+    def update_repositories_json_file(self) -> List[dict]:
+        print("Updating repositories file...")
+        repositories = self.retrieve_all(self.get_repositories)
+        print(f"Retrieved {len(repositories)} repositories")
+
+        with open("repositories.json", "w") as f:
+            f.write(json.dumps(repositories, indent=2))
+
+        return repositories

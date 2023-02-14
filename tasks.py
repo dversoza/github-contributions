@@ -1,6 +1,5 @@
 import json
 import os
-import time
 
 from services import data_persistency
 from services.repository import RepositoryService
@@ -12,99 +11,116 @@ repository_service = RepositoryService(
 )
 
 
-def retrieve_all_repositories_data_in_json_format():
-    print("Retrieving all repositories...")
-    repositories = repository_service.retrieve_all(repository_service.get_repositories)
-    print(f"Retrieved {len(repositories)} repositories")
+def _retrieve_commits_for_repository(repository_name):
+    print(f"Retrieving commits for {repository_name}...")
+    commits = repository_service.retrieve_all(
+        repository_service.get_repository_commits, repository=repository_name
+    )
+    print(f"Retrieved {len(commits)} commits")
 
-    with open("repositories.json", "w") as f:
-        f.write(json.dumps(repositories, indent=2))
+    with open(f"commits/{repository_name}.json", "w") as f:
+        f.write(json.dumps(commits, indent=2))
+
+
+def _retrieve_dependabot_alerts_for_repository(repository_name):
+    print(f"Retrieving dependabot alerts for {repository_name}...")
+    dependabot_alerts = repository_service.retrieve_all(
+        repository_service.get_repository_dependabot_alerts, repository=repository_name
+    )
+    print(f"Retrieved {len(dependabot_alerts)} dependabot alerts")
+
+    with open(f"dependabot_alerts/{repository_name}.json", "w") as f:
+        f.write(json.dumps(dependabot_alerts, indent=2))
+
+    data_persistency.convert_dependabot_alerts_json_into_csv(repository_name)
+
+
+def _retrieve_pull_requests_for_repository(repository_name):
+    print(f"Retrieving pull requests for {repository_name}...")
+    pull_requests = repository_service.retrieve_all(
+        repository_service.get_repository_pull_requests,
+        repository=repository_name,
+        state=repository_service.PullRequestStates.ALL,
+    )
+    print(f"Retrieved {len(pull_requests)} pull requests")
+
+    with open(f"pull_requests/{repository_name}.json", "w") as f:
+        f.write(json.dumps(pull_requests, indent=2))
+
+
+def _retrieve_review_comments_for_repository(repository_name):
+    print(f"Retrieving review comments for {repository_name}...")
+    review_comments = repository_service.retrieve_all(
+        repository_service.get_repository_review_comments, repository=repository_name
+    )
+    print(f"Retrieved {len(review_comments)} review comments")
+
+    with open(f"review_comments/{repository_name}.json", "w") as f:
+        f.write(json.dumps(review_comments, indent=2))
+
+
+def retrieve_all_repositories_data():
+    repositories = repository_service.update_repositories_json_file()
 
     for repository in repositories:
-        ### Pull Requests ###
-        print(f"Retrieving pull requests for {repository['name']}...")
-        pull_requests = repository_service.retrieve_all(
-            repository_service.get_repository_pull_requests,
-            repository=repository["name"],
-            state=repository_service.PullRequestStates.ALL,
-        )
-        print(f"Retrieved {len(pull_requests)} pull requests")
-
-        with open(f"pull_requests/{repository['name']}.json", "w") as f:
-            f.write(json.dumps(pull_requests, indent=2))
-
         ### Commits ###
-        print("Retrieving all commits...")
-        commits = repository_service.retrieve_all(
-            repository_service.get_repository_commits, repository=repository["name"]
-        )
-        print(f"Retrieved {len(commits)} commits")
+        _retrieve_commits_for_repository(repository["name"])
 
-        with open(f"commits/{repository['name']}.json", "w") as f:
-            f.write(json.dumps(commits, indent=2))
+        ### Dependabot Alerts ###
+        _retrieve_dependabot_alerts_for_repository(repository["name"])
+
+        ### Pull Requests ###
+        _retrieve_pull_requests_for_repository(repository["name"])
 
         ### Review Comments ###
-        print("Retrieving all review comments...")
-        review_comments = repository_service.retrieve_all(
-            repository_service.get_repository_review_comments,
-            repository=repository["name"],
-        )
-        print(f"Retrieved {len(review_comments)} review comments")
+        _retrieve_review_comments_for_repository(repository["name"])
 
-        with open(f"review_comments/{repository['name']}.json", "w") as f:
-            f.write(json.dumps(review_comments, indent=2))
-
-
-def convert_all_json_into_csv():
-    with open("repositories.json", "r") as f:
-        repositories = json.loads(f.read())
-
-    for repository in repositories:
-        print(f"Converting {repository['name']} ...")
-        try:
-            start_time = time.time()
-            data_persistency.convert_commits_json_into_csv(repository["name"])
-            data_persistency.convert_pull_requests_json_into_csv(repository["name"])
-            data_persistency.convert_review_comments_json_into_csv(repository["name"])
-            print(
-                f"Finished {repository['name']} in {time.time() - start_time} seconds"
-            )
-        except Exception as e:
-            print(f"\n>>>>> Failed to convert {repository['name']}: {e}\n")
-
-
-def merge_all_repositories_data():
     data_persistency.merge_all_repositories_commits_csvs()
+    data_persistency.merge_all_repositories_dependabot_alerts_csvs()
     data_persistency.merge_all_repositories_pull_requests_csvs()
     data_persistency.merge_all_repositories_review_comments_csvs()
 
 
-def retrieve_all_dependabot_alerts():
-    print("Retrieving all repositories...")
-    repositories = repository_service.retrieve_all(repository_service.get_repositories)
-    print(f"Retrieved {len(repositories)} repositories")
+def retrieve_all_commits():
+    repositories = repository_service.update_repositories_json_file()
 
     for repository in repositories:
-        print(f"Retrieving dependabot alerts for {repository['name']}...")
-        dependabot_alerts = repository_service.retrieve_all(
-            repository_service.get_repository_dependabot_alerts,
-            repository=repository["name"],
-        )
-        print(f"Retrieved {len(dependabot_alerts)} dependabot alerts")
+        _retrieve_commits_for_repository(repository["name"])
 
-        with open(f"dependabot_alerts/{repository['name']}.json", "w") as f:
-            f.write(json.dumps(dependabot_alerts, indent=2))
+    data_persistency.merge_all_repositories_commits_csvs()
+
+
+def retrieve_all_dependabot_alerts():
+    repositories = repository_service.update_repositories_json_file()
+
+    for repository in repositories:
+        _retrieve_dependabot_alerts_for_repository(repository["name"])
+
+    data_persistency.merge_all_repositories_dependabot_alerts_csvs()
+
+
+def retrieve_all_pull_requests():
+    repositories = repository_service.update_repositories_json_file()
+
+    for repository in repositories:
+        _retrieve_pull_requests_for_repository(repository["name"])
+
+    data_persistency.merge_all_repositories_pull_requests_csvs()
+
+
+def retrieve_all_review_comments():
+    repositories = repository_service.update_repositories_json_file()
+
+    for repository in repositories:
+        _retrieve_review_comments_for_repository(repository["name"])
+
+    data_persistency.merge_all_repositories_review_comments_csvs()
 
 
 TASKS = [
-    (
-        "Retrieve repositories analytics data from Github (commits, pull requests and review comments)",
-        retrieve_all_repositories_data_in_json_format,
-    ),
-    ("Convert all JSON files into CSV files", convert_all_json_into_csv),
-    (
-        "Merge all repositories data into one CSV file (to analyze in Excel or similar)",
-        merge_all_repositories_data,
-    ),
-    ("Retrieve all dependabot alerts", retrieve_all_dependabot_alerts),
+    ("Retrieve all repositories Commits", retrieve_all_commits),
+    ("Retrieve all repositories Dependabot Alerts", retrieve_all_dependabot_alerts),
+    ("Retrieve all repositories Pull Requests", retrieve_all_pull_requests),
+    ("Retrieve all repositories Review Comments", retrieve_all_review_comments),
+    ("Retrieve all data from all repositories", retrieve_all_repositories_data),
 ]
